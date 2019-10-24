@@ -85,15 +85,15 @@ end process Clock_Divider;
 --------------------------------------------------------------------------------
 Clock_State: process(clkVal, startVal, state)
 begin
-   if falling_edge(clkVal) then
+	if falling_edge(clkVal) then
 		if startVal = '0' then
 			state <= nextState;
 		end if;
-	elsif rising_edge(clkVal) then
+	--elsif rising_edge(clkVal) then
 		if startVal = '1' then
 			state <= startState;
 		end if;
-   end if;
+	end if;
 end process Clock_State;
 
 --------------------------------------------------------------------------------
@@ -276,18 +276,21 @@ begin
 				i_SDA <= 'Z';
 				zDataRecieved(dataCount+8) <= SDA;
 			when startState =>
+				i_SDA <= 'Z';
 				i_SDA <= '0';
 			when others =>
-				--do nothing
 		end case;
-	elsif rising_edge(clkVal) then
-		if state = startState then
-			i_SDA <= '1';
-		else
-			SDA <= 'Z';
-		end if;
 	end if;
 end process FSM_Data;
+
+Data_Proc: process(clkVal, state)
+begin
+	if rising_edge(clkVal) and state = startState then
+		if state = startState then
+			i_SDA <= '1';
+		end if;
+	end if;
+end process Data_Proc;
 
 --------------------------------------------------------------------------------
 -- Data Counter
